@@ -1,0 +1,24 @@
+- hosts: all
+  tasks:
+  - name: install httpd software
+    package:
+      name: "httpd"
+      state: present
+    register: x
+  - name: document root dir
+    file:
+      state: directory
+      dest: "/var/www/modi"
+    register: y
+  - name: configure webserver
+    copy:
+      dest: /etc/httpd/conf.d/
+      src: modi.conf
+    when: x.rc==0
+    notify: service httpd
+
+  handlers:
+  - name: service httpd
+    service:
+      name: httpd
+      state: restarted
